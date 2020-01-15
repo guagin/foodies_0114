@@ -1,8 +1,10 @@
 import { find } from 'lodash'
 import { UserNotFound } from '../../error'
-import { UserDTO } from '../interface/user-repository'
+import { UserDTO, UserRepository } from '../interface/user-repository'
+import { CreateUserInput } from '../../user'
+import md5 = require('md5')
 
-export class UserRepositoryLocalImpl {
+export class UserRepositoryLocalImpl implements UserRepository {
     private datas: UserDTO[]
     constructor() {
         this.datas = []
@@ -16,5 +18,14 @@ export class UserRepositoryLocalImpl {
             throw new UserNotFound(`${userId}`)
         }
         return result
+    }
+
+    async create(input: CreateUserInput): Promise<UserDTO> {
+        const user = {
+            userId: input.userId,
+            password: md5(input.password),
+        }
+        this.datas.push(user)
+        return user
     }
 }
